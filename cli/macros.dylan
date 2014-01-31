@@ -48,25 +48,27 @@ define macro cli-command-aux-definer
   // definitions that expand into keywords
   keywords:
     { } => { }
-    { help ?text:expression; ... }
-      => { help: ?text, ... }
-    { implementation ?:expression; ... }
+    { ?keyword; ... } => { ?keyword, ... }
+  keyword:
+    { help ?text:expression }
+      => { help: ?text }
+    { implementation ?:expression }
       => { handler: method (p :: <cli-parser>)
-                      => ();
+                     => ();
                       ?expression
-                    end method, ... }
-    { ?parameter-adjectives parameter ?:name; ... } => { ... }
-    { ?parameter-adjectives parameter ?:name :: ?type:expression; ... } => { ... }
+                    end method }
+    { ?other:*; ... } => { } // XXX DFMC CRASH
 
   // definitions that define parameters
   parameters:
     { } => { }
-    { help ?text:expression; ...       } => { ... }
-    { implementation ?:expression; ... } => { ... }
-    { ?parameter-adjectives parameter ?:name; ... }
-      => { make-param(%command, ?#"name", ?parameter-adjectives); ... }
-    { ?parameter-adjectives parameter ?:name :: ?type:expression; ... }
-      => { make-param(%command, ?#"name", type: ?type, ?parameter-adjectives); ... }
+    { ?parameter; ... } => { ?parameter, ... }
+  parameter:
+    { ?parameter-adjectives parameter ?:name }
+      => { make-param(%command, ?#"name", ?parameter-adjectives) }
+    { ?parameter-adjectives parameter ?:name :: ?type:expression }
+      => { make-param(%command, ?#"name", type: ?type, ?parameter-adjectives) }
+    { ?other:* } => { }
 
   // parameter adjectives
   parameter-adjectives:
